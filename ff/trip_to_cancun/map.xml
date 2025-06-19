@@ -817,7 +817,7 @@
         <region id="playing-field"/>
     </negative>
     <!-- Main playing region -->
-    <cuboid id="playing-field" min="-47,23,-99" max="0,30,10"/>
+    <cuboid id="playing-field" min="-48,23,-100" max="1,30,11"/>
     <apply block-break="never"/>
     <apply filter="game_state=${initial}" region="flag-post" kit="flag-carrier"/>
     <!-- END TOM BRADY  START BRIDGE INCLUDE > -->
