@@ -4,7 +4,7 @@
 <version>1.0.0</version>
 <objective>Capture the flag at the end zone on the enemies side!</objective>
 <created>2025-07-06</created>
-<time result="score" overtime="1m" max-overtime="1m">8m</time>
+<time result="score" overtime="1m" max-overtime="1m">12m</time>
 <constants>
     <!-- game_state & player_state -->
     <constant id="initial">0</constant>
@@ -56,13 +56,13 @@
     <spawn team="team-two" kit="map-kit" yaw="${team-two-yaw}" pitch="${team-two-pitch}" region="team-two-spawn-point"/>
     <default>
         <regions>
-            <point yaw="90">35.5,31,-43.5</point>
+            <point yaw="90">35.5,51,-43.5</point>
         </regions>
     </default>
 </spawns>
 <teams>
-    <team id="team-one" color="blue" max="6">Blue</team>
-    <team id="team-two" color="red" max="6">Red</team>
+    <team id="team-one" color="blue" max="11">Blue</team>
+    <team id="team-two" color="red" max="11">Red</team>
 </teams>
 <consumables>
     <consumable id="use-snowball" on="right click" override="false" action="snowball-thrown" consume="false"/>
@@ -799,9 +799,9 @@
     <!-- Scoring nets -->
     <union id="nets">
         <!-- Blue's Net -->
-        <cuboid id="team-one-portal" min="-56,24,-100" max="9,28,-89"/> <!-- where red scores -->
+        <cuboid id="team-one-portal" min="-52,24,-100" max="5,28,-89"/> <!-- where red scores -->
         <!-- Red's Net -->
-        <cuboid id="team-two-portal" min="-56,24,0" max="9,28,11"/> <!-- where blue scores -->
+        <cuboid id="team-two-portal" min="-52,24,0" max="5,28,11"/> <!-- where blue scores -->
     </union>
     <!-- Round cages -->
     <union id="cages">
@@ -817,7 +817,7 @@
         <region id="playing-field"/>
     </negative>
     <!-- Main playing region -->
-    <cuboid id="playing-field" min="-56,23,-100" max="9,30,11"/>
+    <cuboid id="playing-field" min="-52,23,-100" max="5,30,11"/>
     <apply block-break="never"/>
     <apply filter="game_state=${initial}" region="flag-post" kit="flag-carrier"/>
     <!-- END TOM BRADY  START BRIDGE INCLUDE > -->
