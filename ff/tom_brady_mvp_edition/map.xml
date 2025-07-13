@@ -459,6 +459,7 @@
     <action id="carrier-died-event" scope="player" filter="died-carrying">
         <set var="player_state" value="${initial}"/>
         <set var="game_state" value="${initial}"/>
+        <set var="flag_carrier" value="0"/>
         <switch-scope inner="match" outer="player">
             <message text="`aThe Flag carrier died!" actionbar="`aFlag carrier died!"/>
             <action id="reset-flag-with-messages"/>
@@ -502,7 +503,7 @@
             <action id="flag-fire"/> <!-- Just in case -->
         </switch-scope>
     </action>
-    <action id="flag-steal-event" filter="game_state=${carry}" scope="player">
+    <action id="flag-steal-event" scope="player">
         <set var="player_state" value="${carry}"/>
         <set var="game_state" value="${carry}"/>
         <set var="flag_carrier" value="1"/>
@@ -550,7 +551,8 @@
     <action id="increment-round" scope="player">
         <set var="team_score" value="team_score+1"/>
         <set var="player_score" value="player_score+1"/>
-        <message text=" `e⚠ `aYou have scored a touchdown!"/>
+        <set var="player_state" value="${initial}"/>
+        <message text=" `e⚠ `aYou scored a touchdown!!"/>
         <message text=" `2You have scored `e{amount} `2touchdown(s) in this match.">
             <replacements>
                 <decimal id="amount" value="player_score"/>

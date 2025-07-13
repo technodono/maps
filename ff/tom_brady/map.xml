@@ -1,13 +1,15 @@
 <map proto="1.5.0">
+<!-- ======================================================================= -->
+<!-- |  "Tom Brady" feauring the "Brady Arcade" engine:                      -->
+<!-- |    - Winner:    First to win 5 rounds                                 -->
+<!-- |    - Gameplay:  Can only enter the scoring Endzone with Flag          -->
+<!-- ======================================================================= -->
 <name>Tom Brady</name>
 <game>Flag Football</game>
-<version>1.0.7</version>
-<objective>Capture the flag at the end zone on the enemies side!</objective>
+<version>1.0.11</version>
+<objective>Capture the flag at the end zone on the enemies' side!</objective>
 <created>2024-09-22</created>
 <time result="score" overtime="1m" max-overtime="1m">8m</time>
-<stats>
-    <stat value="player_score" append="true" name="`6Touchdowns" />
-</stats>
 <constants>
     <!-- game_state & player_state -->
     <constant id="initial">0</constant>
@@ -18,7 +20,9 @@
     <constant id="died">4</constant>
     <!-- general constants -->
     <constant id="map-origin">55.5,0,144.5</constant>
-    <constant id="overtime-default">1</constant>
+    <constant id="flag-rotation">0</constant>
+    <constant id="overtime-default">1</constant> <!-- 0: Off, 1: On, 2: First to Score -->
+    <constant id="score-points">1</constant>
     <constant id="score-limit">5</constant>
     <constant id="mercy-limit">-1</constant>
     <constant id="void-plane">-64</constant>
@@ -45,9 +49,8 @@
 <contributors>
     <contributor uuid="2fd57dff-4cff-4b60-96a4-d26e37759c03" contribution="XML"/> <!-- Furrie -->
     <contributor uuid="9d4779a8-d35f-45d2-b51c-95de7a77e128" contribution="Bridge Snippets"/> <!-- zzuf -->
-    <contributor uuid="c25a6f7b-4c42-40da-8cd6-add53f0c84eb" contribution="XML"/> <!-- arcadeboss -->
-    <contributor uuid="e419983c-bb20-438d-b900-717f131a272f" contribution="XML"/> <!-- KuNet -->
-    <contributor uuid="aa6a6b35-db22-4cff-bfce-3093cf4cf2e6" contribution="XML"/> <!-- honeyfuggle -->
+    <contributor uuid="c25a6f7b-4c42-40da-8cd6-add53f0c84eb" contribution="XML Refinements"/> <!-- arcadeboss -->
+    <contributor uuid="e419983c-bb20-438d-b900-717f131a272f" contribution="XML Message Names"/> <!-- KuNet -->
 </contributors>
 <respawn auto="true" delay="3s"/>
 <gamerules>
@@ -71,8 +74,8 @@
     <consumable id="bridge-apple" on="eat" override="true" action="bridge-apple-kit"/>
 </consumables>
 <broadcasts>
-    <tip after="10s" every="70s">You can `6pass`r to your teammates by throwing the Football!</tip>
-    <tip after="25s" every="2m">Score by running into the end zone on the enemies side!</tip>
+    <tip after="10s" every="70s">`6Pass`r to your teammates by throwing the Football!</tip>
+    <tip after="25s" every="2m">Score by running into the end zone on the enemies' side!</tip>
 </broadcasts>
 <variables>
     <timelimit id="time_limit"/>
@@ -84,12 +87,11 @@
     <variable id="round_status" scope="match" default="2"/>
     <variable id="buytime" scope="match" default="0"/>
     <variable id="do_fire" scope="match" default="0"/>
-    <variable id="overtime" scope="match" default="${overtime-default}"/> <!-- 0: Off, 1: On, 2: First to score -->
+    <variable id="overtime" scope="match" default="${overtime-default}"/>
     <variable id="scoring_team" scope="match" default="0"/>
     <variable id="pre_round" scope="match" default="${pre-round-enabled}"/>
     <variable id="goal_scorer_enabled" scope="match" default="${goal-scorer}"/>
     <variable id="show_tutorial" scope="match" default="${show-tutorial}"/>
-    <!-- 0=POST  1=CARRY  2=THROW  3=CATCH  4=DIED -->
     <variable id="player_state" scope="player" default="${initial}" exclusive="1"/>
     <variable id="player_score" scope="player" default="0"/>
     <variable id="current_team" scope="player" default="0"/> <!-- 0: Observers, 1: team-one, 2: team-two -->
@@ -316,6 +318,7 @@
         <team>team-one</team>
         <region id="team-two-portal"/>
         <variable var="can_score">1</variable>
+        <variable var="player_state">${carry}</variable>
         <match-running/>
         <alive/>
         <participating/>
@@ -324,6 +327,7 @@
         <team>team-two</team>
         <region id="team-one-portal"/>
         <variable var="can_score">1</variable>
+        <variable var="player_state">${carry}</variable>
         <match-running/>
         <alive/>
         <participating/>
@@ -432,7 +436,7 @@
     <action id="snowball-thrown" scope="player">
         <set var="player_state" value="${throw}"/>
         <set var="game_state" value="${throw}"/>
-        <set var="flag_carrier" value="1"/>
+        <set var="flag_carrier" value="0"/>
         <switch-scope inner="match" outer="player">
             <message text="`e⚠ {player} `6threw the `c`lFootball`6!`r" actionbar="`l{player} `6threw!">
                 <replacements>
@@ -498,6 +502,7 @@
     <action id="carrier-died-event" scope="player" filter="died-carrying">
         <set var="player_state" value="${initial}"/>
         <set var="game_state" value="${initial}"/>
+        <set var="flag_carrier" value="0"/>
         <switch-scope inner="match" outer="player">
             <message text="`aThe Flag carrier died!" actionbar="`aFlag carrier died!"/>
             <action id="reset-flag-with-messages"/>
@@ -511,7 +516,7 @@
     </action>
     <action id="reset-flag" scope="match">
         <set var="game_state" value="${initial}"/>
-        <fill region="flag-post" material="standing banner"/>
+        <fill region="flag-post" material="standing banner:${flag-rotation}"/>
         <fill region="flag-indicator" material="sea lantern"/>
         <fill region="flag-indicator2" material="sea lantern"/>
         <kill-entities filter="snowball-entity"/>
@@ -541,7 +546,7 @@
             <action id="flag-fire"/> <!-- Just in case -->
         </switch-scope>
     </action>
-    <action id="flag-steal-event" filter="game_state=${carry}" scope="player">
+    <action id="flag-steal-event" scope="player">
         <set var="player_state" value="${carry}"/>
         <set var="game_state" value="${carry}"/>
         <set var="flag_carrier" value="1"/>
@@ -587,9 +592,10 @@
     <trigger action="flag-fire" filter="flag-fire-go" scope="match"/>
     <!-- END TOM BRADY  START BRIDGE INCLUDE > -->
     <action id="increment-round" scope="player">
-        <set var="team_score" value="team_score+1"/>
+        <set var="team_score" value="team_score+${score-points}"/>
         <set var="player_score" value="player_score+1"/>
-        <message text=" `e⚠ `aYou have scored a touchdown!"/>
+        <set var="player_state" value="${initial}"/>
+        <message text=" `e⚠ `aYou scored a touchdown!!"/>
         <message text=" `2You have scored `e{amount} `2touchdown(s) in this match.">
             <replacements>
                 <decimal id="amount" value="player_score"/>
@@ -880,9 +886,6 @@
     <item>banner</item>
     <item>golden apple</item>
 </itemremove>
-<toolrepair>
-    <tool>stone sword</tool>
-</toolrepair>
 <friendlyfire>on</friendlyfire>
 <friendlyfirerefund>off</friendlyfirerefund>
 <hunger>
