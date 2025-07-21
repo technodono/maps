@@ -267,7 +267,7 @@
     <after id="match-start-delay" filter="match-start" duration="0.1s"/>
     <after id="pre-round-reset" filter="all(can_score=0,not(ended),pre_round=1)" duration="0.1s"/>
     <after id="7s-after-throw" duration="7s" filter="game_state=${throw}" message="`b» `fFlag will respawn in {0} `b«"/>
-    <after id="just-before-reset" duration="4.8s" filter="game_state=${throw}"/>
+    <after id="just-before-reset" duration="6.8s" filter="game_state=${throw}"/>
     <all id="valid-receive">
         <cause id="got-shot">projectile</cause>
         <attacker>
