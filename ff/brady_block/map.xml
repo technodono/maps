@@ -250,6 +250,12 @@
     <give kit="remove-effects-kit" filter="not-on-buytime"/>
 </kits>
 <filters>
+    <all id="block-list">
+        <material id="leaves">leaves</material>
+        <not>
+           <void/>
+        </not>
+    </all>
     <observing id="is-observer"/>
     <entity id="snowball-entity">snowball</entity>
     <allow id="is-participating">
@@ -853,6 +859,7 @@
     </union>
     <!-- Flag spawnpoint -->
     <cuboid id="flag-post" min="-24,27,-45" max="-23,28,-44"/>
+	<cuboid id="flag-pole" min="-22,23,-45" max="-25,26,-44"/>
     <cuboid id="flag-indicator" min="-25,32,-46" max="-22,34,-43"/>
     <cuboid id="flag-indicator2" min="-25,35,-46" max="-22,40,-43"/>
     <!-- Non-buildable region -->
@@ -861,8 +868,11 @@
     </negative>
     <!-- Main playing region -->
     <cuboid id="playing-field" min="-49,23,-99" max="1,30,10"/>
-	<cuboid id="buildable-field" min="-49,23,-89" max="1,30,0"/>
-    <apply block-break="never"/>
+	<cuboid id="buildable-field" min="-49,24,-89" max="1,26,0"/>
+	<cuboid id="no-leaves" min="-18.5,24,-39.5" max="-29,26,-50"/>
+    <apply block-break="never" region="not-buildable"/>
+	<apply block-break="never" region="flag-pole"/>
+	<apply block-place="never" region="no-leaves"/>
     <!-- <apply enter="deny(only-blue)" region="team-one-portal" message="You may not enter your own goal!"/> -->
     <!-- <apply enter="deny(only-red)" region="team-two-portal" message="You may not enter your own goal!"/> -->
     <!-- <apply enter="carrying-snowball" region="nets" message="You may not enter the goal without the Flag!"/> -->
@@ -928,6 +938,7 @@
     <item>golden apple</item>
 	<item>leaves</item>
 	<item>sapling</item>
+	<item>feather</item>
 </itemremove>
 <friendlyfire>on</friendlyfire>
 <friendlyfirerefund>off</friendlyfirerefund>
