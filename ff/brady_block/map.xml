@@ -131,7 +131,7 @@
         <leggings unbreakable="true" team-color="true" locked ="true" material="leather leggings"/>
         <boots unbreakable="true" locked ="true" team-color="true" material="leather boots"/>
 		<item slot="3" amount="4" material="leaves" name="`6Body Block"/>
-		<item slot="3" amount="1" consumable="sprint" name="Sprint" material="feather"/>
+		<item slot="4" amount="1" consumable="sprint" name="Sprint" material="feather"/>
         <item slot="0" unbreakable="true" locked="true" material="stone sword"/>
         <item slot="1" amount="1" locked="true" consumable="use-snowball" name="`4`lFootball `f`oYou can also pass to your teammates"  material="snowball"/>
         <item slot="8" amount="1" locked="true" material="golden apple"/>
