@@ -392,11 +392,11 @@
     <not id="no-absorption">
         <effect>absorption</effect>
     </not>
-    <all id="after-20m">
-        <time>20m</time>
+    <all id="after-60m">
+        <time>60m</time>
         <variable id="overtime-disabled" var="overtime">0</variable>
     </all>
-    <after duration="5m" filter="after-20m">
+    <after duration="5m" filter="after-60m">
         <message>`4» `fThe match will `cend`f in {0} `4«</message>
     </after>
     <observing id="is-observer"/>
@@ -819,8 +819,7 @@
     <cuboid id="flag-indicator2-middle" min="46,13,29" max="47,18,30"/>
     <!-- Non-buildable region -->
     <negative id="not-buildable">
-        <region id="playing-field"/>
-    </negative>
+        
     <!-- Main playing region -->
     <cuboid id="playing-field" min="-14,0,3" max="107,7,56"/>
     <apply block-break="never"/>
