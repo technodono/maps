@@ -1,7 +1,7 @@
 <map>
 <!-- Touchdown gamemode include file -->
 <!-- XML by zzuf, arcadeboss, MewTwoKing, Furrie, TommyHillfigger, KuNet, honeyfuggle & mameBT -->
-<!-- Version 2025.08.03-2 -->
+<!-- Version 2025.08.03-2-fireballs -->
 <game>Touchdown</game>
 <objective>Capture the flag at the end zone on the enemies' side!</objective>
 <constants fallback="true">
@@ -79,6 +79,9 @@
     <if constant="inner-indicator-materials" constant-value="true">
         <constant id="indicator-inner-material">sea lantern</constant>
     </if>
+    <!-- Change slot if using custom kit with different slot -->
+    <constant id="gapple-slot">8</constant>
+    <constant id="gapple-locked">true</constant>
 </constants>
 <include id="void-death"/>
 <include id="gapple-kill-reward"/>
@@ -101,8 +104,8 @@
     </kit>
     <kit id="main-kit">
         <clear items="true" armor="false" effects="false"/>
-        <item slot="0" unbreakable="true" material="${melee-weapon}"/>
-        <item slot="8" material="golden apple"/>
+        <item slot="0" unbreakable="true" locked="true" material="${melee-weapon}"/>
+        <item slot="8" locked="true" material="golden apple"/>
         <if constant="enable-night-vision" constant-value="true">
             <effect>night vision</effect>
         </if>
@@ -116,7 +119,7 @@
         <boots unbreakable="true" locked="true" material="iron boots"/>
     </kit>
     <kit id="football-kit">
-        <item prevent-sharing="true" consumable="use-snowball" name="`4`lFootball" material="snowball"/>
+        <item slot="1" locked="true" consumable="use-snowball" name="`4`lFootball" material="snowball"/>
     </kit>
     <kit id="flag-carrier-kit" force="true">
         <kit id="main-kit"/>
@@ -244,7 +247,7 @@
     <! - meaning if a player picks up that snowball, it should be treated as a flag pickup. -->
     <all id="flag-pickup-via-entity">
         <carrying id="carrying-football">
-            <item prevent-sharing="true" consumable="use-snowball" name="`4`lFootball" material="snowball"/>
+            <item locked="true" consumable="use-snowball" name="`4`lFootball" material="snowball"/>
         </carrying>
         <not>
             <carrying-flag id="has-flag">flag</carrying-flag>
