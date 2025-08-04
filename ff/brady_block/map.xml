@@ -4,7 +4,7 @@
 <!-- |    - Winner:    First to win 5 rounds                                 -->
 <!-- |    - Gameplay:  Can only enter the scoring Endzone with Flag          -->
 <!-- ======================================================================= -->
-<name>Brady Block</name>
+<name>Brady Block: High IQ Color palette</name>
 <game>Flag Football</game>
 <version>1.0.11</version>
 <objective>Capture the flag at the end zone on the enemies' side!</objective>
@@ -34,9 +34,12 @@
     <constant id="pre-round-time">5s</constant>
     <constant id="max-health">20</constant>
     <constant id="show-tutorial">1</constant>
+	<constant id="feather-check-enabled">1</constant>
+	<constant id="feather-type">feather</constant>
+	<constant id="feather-item-kit">feather-kit</constant>
     <!-- Teams -->
-    <constant id="team-one-spawn">-23.5,35,-102.5</constant>
-    <constant id="team-two-spawn">-23.5,35,13.5</constant>
+    <constant id="team-one-spawn">-23.5,33,-97.5</constant>
+    <constant id="team-two-spawn">-23.5,33,8.5</constant>
     <constant id="team-one-yaw">0</constant>
     <constant id="team-two-yaw">180</constant>
     <constant id="team-one-pitch">0</constant>
@@ -68,8 +71,8 @@
     </default>
 </spawns>
 <teams>
-    <team id="team-one" color="blue" max="6">Blue</team>
-    <team id="team-two" color="red" max="6">Red</team>
+    <team id="team-one" color="black" max="6">Black</team>
+    <team id="team-two" color="gold" max="6">Orange</team>
 </teams>
 <consumables>
     <consumable id="use-snowball" on="right click" override="false" action="snowball-thrown" consume="false"/>
@@ -97,6 +100,7 @@
     <variable id="goal_scorer" scope="player" exclusive="1"/>
     <variable id="flag_carrier" scope="player" exclusive="1"/>
     <variable id="instaheal" scope="match" default="0"/>
+	<variable id="feather_check" scope="match" default="${feather-check-enabled}"/>
 </variables>
 <kits>
     <kit id="heal-instant">
@@ -109,16 +113,20 @@
 	<kit id="sprint-kit">
         <effect duration="3s" amplifier="2">speed</effect>
     </kit>
+	<kit id="feather-kit">
+		<item slot="3" amount="1" consumable="sprint" name="Sprint" material="${feather-type}"/>
+	</kit>
     <kit id="keeper-kit" force="true">
         <clear/>
         <item slot="0" unbreakable="true" locked="true" material="stone sword"/>
+		<item slot="1" locked="true" material="402" name="`4`lX"/>/>
         <item slot="8" locked="true" material="golden apple"/>
         <helmet unbreakable="true" team-color="true" locked="true" material="leather helmet"/>
         <chestplate unbreakable="true" team-color="true" locked="true" material="leather chestplate"/>
         <leggings unbreakable="true" locked="true" material="chainmail leggings"/>
         <boots unbreakable="true" locked="true" material="iron boots"/>
-		<item slot="3" amount="4" material="leaves" name="`6Body Block"/>
-		<item slot="2" amount="1" consumable="sprint" name="Sprint" material="feather"/>
+		<item slot="2" amount="4" material="leaves" name="`6Body Block"/>
+		<item slot="3" amount="1" consumable="sprint" name="Sprint" material="${feather-type}"/>
         <effect duration="0.01s" amplifier="1">night vision</effect>
         <effect duration="0.01s" amplifier="1">slowness</effect>
         <max-health>20</max-health>
@@ -130,10 +138,10 @@
         <chestplate unbreakable="true" color="FFFFFF" locked ="true" material="leather chestplate"/>
         <leggings unbreakable="true" team-color="true" locked ="true" material="leather leggings"/>
         <boots unbreakable="true" locked ="true" team-color="true" material="leather boots"/>
-		<item slot="3" amount="4" material="leaves" name="`6Body Block"/>
-		<item slot="4" amount="1" consumable="sprint" name="Sprint" material="feather"/>
+		<item slot="2" amount="4" material="leaves" name="`6Body Block"/>
+		<item slot="3" amount="1" consumable="sprint" name="Sprint" material="${feather-type}"/>
         <item slot="0" unbreakable="true" locked="true" material="stone sword"/>
-        <item slot="1" amount="1" locked="true" consumable="use-snowball" name="`4`lFootball `f`oYou can also pass to your teammates"  material="snowball"/>
+        <item slot="1" amount="1" locked="true" consumable="use-snowball" name="`4`lFootball"  material="snowball"/>
         <item slot="8" amount="1" locked="true" material="golden apple"/>
         <effect ambient="false">night vision</effect>
         <effect ambient="false">slowness</effect>
@@ -269,7 +277,7 @@
     <! - meaning if a player picks up that snowball, it should be treated as a flag pickup. -->
     <all id="flag-pickup-via-entity">
         <carrying id="carrying-snowball">
-            <item material="snowball" locked="true" consumable="use-snowball" name="`4`lFootball `f`oYou can also pass to your teammates"/>
+            <item material="snowball" locked="true" consumable="use-snowball" name="`4`lFootball"/>
         </carrying>
         <not>
             <wearing>
@@ -318,6 +326,29 @@
         <observing/>
         <variable var="player_state">${carry}</variable>
     </all>
+	<!-- SPRINT STUFF> -->
+	<all id="no-feathers">
+        <not>
+            <carrying ignore-metadata="true"><item material="${feather-type}"/></carrying>
+        </not>
+        <participating/>
+        <alive/>
+        <variable var="feather_check">1</variable>
+    </all>
+    <all id="1-feather">
+        <carrying ignore-metadata="true"><item material="${feather-type}"/></carrying>
+        <participating/>
+        <variable var="feather_check">1</variable>
+    </all>
+    <all id="more-than-1-feather">
+        <carrying ignore-metadata="true" amount="(1,oo)"><item material="${feather-type}"/></carrying>
+        <participating/>
+        <variable var="feather_check">1</variable>
+    </all>
+    <after id="feather-regen" duration="7.5s" filter="no-feathers"/>
+    <not id="no-absorption">
+        <effect>absorption</effect>
+    </not>
     <!-- END TOM BRADY  START BRIDGE INCLUDE > -->
     <deny id="deny-participating">
         <participating/>
@@ -397,9 +428,6 @@
             <match-running/>
         </all>
     </after>
-    <not id="no-absorption">
-        <effect>absorption</effect>
-    </not>
     <all id="after-13m">
         <time>13m</time>
         <variable id="overtime-disabled" var="overtime">0</variable>
@@ -599,13 +627,33 @@
     <action id="set-keeper-kit" scope="player">
         <action id="give-keeper-kit"/>
     </action>
-    <action id="apply-heal" scope="player">
+	    <action id="apply-heal" scope="player">
         <action filter="instaheal=0">
             <kit id="heal-gapple"/>
         </action>
         <action filter="instaheal=1">
             <kit id="heal-instant"/>
         </action>
+    </action>s
+	<action id="remove-feather" scope="player">
+        <replace-item ignore-metadata="true">
+            <find material="${feather-type}"/>
+            <replace material="air"/>
+        </replace-item>
+    </action>
+    <action id="no-feathers-message" scope="player">
+        <message text=" `e⚠ `cYou can sprint again in `e7.5`c seconds!" actionbar="`c`lNO STAMINA!"/>
+    </action>
+    <action id="1-feather-message" scope="player">
+        <message actionbar="`a`lSPRINT READY!"/>
+    </action>
+    <action id="give-feather" scope="player">
+        <kit id="feather-kit"/>
+        <message text=" `eFull stamina!"/>
+        <sound key="${entity.item.pickup}" pitch="0.8"/>
+    </action>
+    <action id="feather-action" scope="player" filter="feather_check=1">
+        <kit id="feather-kit"/>
     </action>
     <trigger action="reset-player-state" filter="player_state=${catch}" scope="player"/>
     <trigger action="reset-player-state" filter="player_state=${died}" scope="player"/>
@@ -622,6 +670,10 @@
     <trigger action="go-sounds" filter="match-start-delay" scope="match"/>
     <trigger action="give-keeper-kit" filter="player_state=${throw}" scope="player"/>
     <trigger action="flag-fire" filter="flag-fire-go" scope="match"/>
+	<trigger filter="feather-regen" action="give-feather" scope="player"/>
+	<trigger filter="more-than-1-feather" action="remove-feather" scope="player"/>
+    <trigger filter="no-feathers" action="no-feathers-message" scope="player"/>
+    <trigger filter="1-feather" action="1-feather-message" scope="player"/>
     <!-- END TOM BRADY  START BRIDGE INCLUDE > -->
     <action id="increment-round" scope="player">
         <set var="team_score" value="team_score+${score-points}"/>
@@ -828,9 +880,6 @@
             <!-- If score/mercy limits are ever made into variables, change scores + those instead -->
         </action>
     </trigger>
-    <action id="tiebreaker-win" scope="player" filter="overtime=2">
-        <set var="team_score" value="${score-limit}"/>
-    </action>
     <trigger filter="not(instaheal-min)" scope="match">
         <action>
             <message text=" `e⚠ `fDue to a lack of players, `6❤ `e`lGAPPLE`f healing will be used."/>
@@ -843,6 +892,9 @@
             <set var="instaheal" value="1"/> 
         </action>
     </trigger>
+	<action id="tiebreaker-win" scope="player" filter="overtime=2">
+       <set var="team_score" value="${score-limit}"/>
+    </action>
 </actions>
 <regions>
     <!-- Scoring nets -->
@@ -913,7 +965,7 @@
         <kit deduct-items="false">
             <item material="golden apple" locked="true" slot="8"/>
 			<item material="leaves" amount="2" name="`6Body Block"/>
-			<item material="feather" amount="1" consumable="sprint" name="Sprint"/>
+			<item material="${feather-type}" amount="1" consumable="sprint" name="Sprint"/>
         </kit>
     </kill-reward>
     <kill-reward filter="any(victim-has-flag,victim-died-with-flag)" action="flag-steal-event" victim-action="death-player-state"/>
@@ -938,7 +990,8 @@
     <item>golden apple</item>
 	<item>leaves</item>
 	<item>sapling</item>
-	<item>feather</item>
+	<item>"${feather-type}</item>
+	<item>firework_charge</item>
 </itemremove>
 <friendlyfire>on</friendlyfire>
 <friendlyfirerefund>off</friendlyfirerefund>
