@@ -15,6 +15,8 @@
     <constant id="team-two-yaw">180</constant>
     <constant id="flag-post">-23.5,27,-44.5</constant>
     <constant id="void-plane">20</constant>
+    <constant id="dynamic-instaheal">false</constant>
+    <constant id="enable-instaheal">false</constant>
     <if variant="comp">
         <constant id="team-size">5</constant>
         <constant id="time-limit">12m</constant>
