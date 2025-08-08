@@ -1,0 +1,71 @@
+<map proto="1.5.0">
+<name>Tom Brawly</name>
+<version>1.0.0</version>
+<gamemode>ffa</gamemode>
+<created>2025-08-07</created>
+<objective>Get the most kills possible!</objective>
+<include id="gapple-kill-reward"/>
+<include id="void-death"/>
+<constant id="void-plane">90</constant>
+<authors>
+    <author uuid="534470be-4122-4762-83e1-f45abb474cdc"/> <!-- Necrozma -->
+</authors>
+<players min="1" max="32" colors="true"/>
+<time>8m</time>
+<kits>
+    <kit id="main-kit">
+        <helmet unbreakable="true" team-color="true" locked="true" material="leather helmet"/>
+        <chestplate unbreakable="true" team-color="true" locked="true" material="leather chestplate"/>
+        <leggings unbreakable="true" locked="true" material="chainmail leggings"/>
+        <boots unbreakable="true" locked="true" material="iron boots"/>
+        <item slot="0" unbreakable="true" material="stone sword"/>
+        <item slot="8" material="golden apple"/>
+        <game-mode>adventure</game-mode>
+    </kit>
+</kits>
+<spawns>
+    <default>
+        <region>
+            <point>0.5,100,0.5</point>
+        </region>
+    </default>
+    <spawn spread="true" kit="main-kit" safe="true">
+        <regions angle="0.5,98,0.5">
+            <cuboid min="-43.5,97,-43.5" max="44.5,97,44.5"/>
+        </regions>
+    </spawn>
+</spawns>
+<regions>
+    <apply block="never" block-physics="never" use="never"/>
+</regions>
+<toolrepair>
+    <tool>stone sword</tool>
+</toolrepair>
+<itemremove>
+    <item>leather helmet</item>
+    <item>leather chestplate</item>
+    <item>leather leggings</item>
+    <item>leather boots</item>
+    <item>chainmail leggings</item>
+    <item>iron boots</item>
+    <item>stone sword</item>
+    <item>banner</item>
+    <item>golden apple</item>
+</itemremove>
+<disabledamage>
+    <damage>fall</damage>
+</disabledamage>
+<hunger>
+    <depletion>off</depletion>
+</hunger>
+<kill-rewards>
+    <kill-reward>
+        <kit>
+            <effect duration="1" amplifier="100">instant health</effect>
+        </kit>
+    </kill-reward>
+</kill-rewards>
+<score>
+    <kills>1</kills>
+</score>
+</map>
