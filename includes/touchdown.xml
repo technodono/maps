@@ -1,7 +1,7 @@
 <map>
 <!-- Touchdown gamemode include file -->
 <!-- XML by zzuf, arcadeboss, MewTwoKing, Furrie, TommyHillfigger, KuNet, honeyfuggle & mameBT -->
-<!-- Version 2025.08.05-1-fireballs -->
+<!-- Version 2025.08.09-1-fireballs -->
 <game>Touchdown</game>
 <objective>Capture the flag at the end zone on the enemies' side!</objective>
 <constants fallback="true">
@@ -455,7 +455,7 @@
     <action id="reset-fire" scope="match">
         <fill region="flag-post" material="air"/>
     </action>
-    <action id="pickup-flag" scope="player" filter="can_score=1">
+    <action id="pickup-flag" scope="player" filter="all(can_score=1,not(game_state=${throw}))">
         <pickup-flag flag="flag"/>
     </action>
     <action id="flag-pickup-event" scope="player" filter="game_state=${initial}">
@@ -583,7 +583,6 @@
     <trigger action="give-main-kit" filter="player_state=${throw}" scope="player"/>
     <trigger action="flag-fire" filter="flag-fire-go" scope="match"/>
     <action id="increment-round" scope="player">
-        <set var="player_state" value="${initial}"/>
         <set var="player_score" value="player_score+1"/>
         <message text=" `e⚠ `aYou scored a touchdown!!"/>
         <message text=" `2You have scored `e{amount} `2touchdown(s) in this match.">
@@ -592,7 +591,6 @@
             </replacements>
         </message>
         <switch-scope outer="player" inner="match">
-            <set var="game_state" value="${initial}"/>
             <set var="can_score" value="0"/>
             <set var="round_status" value="1"/>
             <action id="reset-fire"/>
@@ -835,7 +833,7 @@
           carry-message="`f`lYou are the `b`lFlag `f`lcarrier!"
           show-messages="false"
           show-effects="false">
-        <post yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="any(flag-posts,all(player_state=${carry},alive),carrying-football)">
+        <post yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)">
             <post id="default-post" respawn-filter="never">${flag-post}</post>
             <if constant="team-flag-posts" constant-value="true">
                 <post id="team-one-post" respawn-filter="never">${team-one-flag-post}</post>
