@@ -1,7 +1,7 @@
 <map>
 <!-- Touchdown gamemode include file -->
 <!-- XML by zzuf, arcadeboss, MewTwoKing, Furrie, TommyHillfigger, KuNet, honeyfuggle & mameBT -->
-<!-- Version 2025.08.09-1-fireballs -->
+<!-- Version 2025.08.21-3-fireballs -->
 <game>Touchdown</game>
 <objective>Capture the flag at the end zone on the enemies' side!</objective>
 <constants fallback="true">
@@ -60,6 +60,7 @@
     <constant id="overtime-default">1</constant> <!-- 0: no overtime; 1: PGM default; 2: Tiebreaker mode -->
     <constant id="mercy-limit">-1</constant>
     <constant id="indicator-outer-material">sea lantern</constant>
+    <constant id="indicator-inner-material" delete="true"/>
     <!-- Experimental or alternate options -->
     <constant id="team-flag-posts">false</constant>
     <constant id="gridiron-engine">false</constant>
@@ -74,11 +75,9 @@
         <constant id="score-limit">-1</constant>
     </if>
     <constant id="melee-weapon">stone sword</constant>
+    <constant id="melee-weapon-name" delete="true"/> <!-- optional: custom name -->
+    <constant id="melee-weapon-enchantment" delete="true"/> <!-- optional: enchantment ("knockback", etc) -->
     <constant id="natural-regeneration">true</constant>
-    <constant id="inner-indicator-materials">false</constant>
-    <if constant="inner-indicator-materials" constant-value="true">
-        <constant id="indicator-inner-material">sea lantern</constant>
-    </if>
     <constant id="gapple-heal-duration">5s</constant>
     <!-- Change slot if using custom kit with different slot -->
     <constant id="gapple-slot">8</constant>
@@ -105,7 +104,7 @@
     </kit>
     <kit id="main-kit">
         <clear items="true" armor="false" effects="false"/>
-        <item slot="0" unbreakable="true" locked="true" material="${melee-weapon}"/>
+        <item slot="0" unbreakable="true" locked="true" name="${melee-weapon-name}" material="${melee-weapon}" enchantment="${melee-weapon-enchantment}"/>
         <item slot="8" locked="true" material="golden apple"/>
         <if constant="enable-night-vision" constant-value="true">
             <effect>night vision</effect>
@@ -405,6 +404,10 @@
     <players id="instaheal-min" min="${instaheal-required}">
         <always/>
     </players>
+    <if constant="team-flag-posts" constant-value="true">
+        <flag-dropped id="dropped-from-team-one-post" post="team-one-post">flag</flag-dropped>
+        <flag-dropped id="dropped-from-team-two-post" post="team-two-post">flag</flag-dropped>
+    </if>
 </filters>
 <actions>
     <action id="give-main-kit" scope="player">
@@ -472,9 +475,11 @@
             <action id="pickup-sounds"/>
             <set var="game_state" value="${carry}"/>
             <set var="do_fire" value="1"/>
-            <fill region="flag-post" material="air"/>
-            <fill region="flag-indicator-upper" material="air"/>
-            <fill region="flag-indicator-lower" material="air"/>
+            <fill region="flag-posts" material="air"/>
+            <unless constant="team-flag-posts" constant-value="true">
+                <fill region="flag-indicator-upper" material="air"/>
+                <fill region="flag-indicator-lower" material="air"/>
+            </unless>
         </switch-scope>
     </action>
     <action id="touchdown-sound" scope="match">
@@ -500,12 +505,14 @@
         <switch-scope inner="player">
             <set var="player_state" value="${initial}"/>
         </switch-scope>
-        <fill region="flag-indicator-upper" material="${indicator-outer-material}"/>
-        <fill region="flag-indicator-lower" material="${indicator-outer-material}"/>
-        <if constant="inner-indicator-materials" constant-value="true">
-            <fill region="flag-indicator-upper-inner" material="${indicator-inner-material}"/>
-            <fill region="flag-indicator-lower-inner" material="${indicator-inner-material}"/>
-        </if>
+        <unless constant="team-flag-posts" constant-value="true">
+            <fill region="flag-indicator-upper" material="${indicator-outer-material}"/>
+            <fill region="flag-indicator-lower" material="${indicator-outer-material}"/>
+            <unless constant="indicator-inner-material" constant-comparison="defined delete">
+                <fill region="flag-indicator-upper-inner" material="${indicator-inner-material}"/>
+                <fill region="flag-indicator-lower-inner" material="${indicator-inner-material}"/>
+            </unless>
+        </unless>
         <kill-entities filter="snowball-entity"/>
     </action>
     <action id="flag-receive-event" scope="player" filter="valid-receive">
@@ -636,24 +643,24 @@
         </action>
     </trigger>
     <action id="message-own-scored" scope="player">
-        <message text="`5# # # # # # # # # # # # # # # #"/>
-        <message text="`5# #      `6» `6`lTOUCHDOWN! `6«`5    # #"/>
-        <message text="`5# #    `aYour team scored!`5    # #"/>
+        <message text="`5`l╔══════════════╗"/>
+        <message text="`6         » `6`lTOUCHDOWN! `6«"/>
+        <message text="`a         Your team scored!"/>
         <action id="message-score-display-team-one"/>
         <action id="message-score-display-team-two"/>
-        <message text="`5# # # # # # # # # # # # # # # #"/>
+        <message text="`5`l╚══════════════╝"/>
         <switch-scope outer="player" inner="match">
             <action id="goal-title"/>
         </switch-scope>
         <sound key="${block.portal.travel}" volume="0.2" pitch="2"/> <!-- OBJECTIVE_GOOD with lower volume -->
     </action>
     <action id="message-enemy-scored" scope="player">
-        <message text="`5# # # # # # # # # # # # # # # #"/>
-        <message text="`5# #      `6» `6`lTOUCHDOWN! `6«`5    # #"/>
-        <message text="`5# #    `cThe enemy scored`5    # #"/>
+        <message text="`5`l╔══════════════╗"/>
+        <message text="`6         » `6`lTOUCHDOWN! `6«"/>
+        <message text="`c         The enemy scored"/>
         <action id="message-score-display-team-one"/>
         <action id="message-score-display-team-two"/>
-        <message text="`5# # # # # # # # # # # # # # # #"/>
+        <message text="`5`l╚══════════════╝"/>
         <sound key="${entity.blaze.death}" volume="0.4" pitch="0.8"/> <!-- OBJECTIVE_BAD with lower volume -->
     </action>
     <action id="message-score-display-player" scope="player">
@@ -667,7 +674,7 @@
         </switch-scope>
     </action>
     <action filter="team-one" id="message-score-display-team-one" scope="player">
-        <message text="`5# #            `f{one-score}`6 `l－`r `f{two-score}`5            # #">
+        <message text="                 `f{one-score}`6 `l-`r `f{two-score}">
             <replacements>
                 <decimal id="one-score" value="team_one_score"/>
                 <decimal id="two-score" value="team_two_score"/>
@@ -675,7 +682,7 @@
         </message>
     </action>
     <action filter="team-two" id="message-score-display-team-two" scope="player">
-        <message text="`5# #            `f{two-score}`6 `l－`r `f{one-score}`5            # #">
+        <message text="                 `f{two-score}`6 `l-`r `f{one-score}">
             <replacements>
                 <decimal id="one-score" value="team_one_score"/>
                 <decimal id="two-score" value="team_two_score"/>
@@ -706,15 +713,15 @@
     </action>
     <trigger filter="after-round-0" action="message-reset-scoring-team" scope="match"/>
     <action id="message-obs-scored" scope="player">
-        <message text="`5# # # # # # # # # # # # # # # #"/>
-        <message text="`5# #      `6» `6`lTOUCHDOWN! `6«`5    # #"/>
-        <message text="`5# #            `f{one-score}`6 `l－`r `f{two-score}`5            # #">
+        <message text="`5`l╔══════════════╗"/>
+        <message text="`6         » `6`lTOUCHDOWN! `6«"/>
+        <message text="                 `f{one-score}`6 `l-`r `f{two-score}">
             <replacements>
                 <decimal id="one-score" value="team_one_score"/>
                 <decimal id="two-score" value="team_two_score"/>
             </replacements>
         </message>
-        <message text="`5# # # # # # # # # # # # # # # #"/>
+        <message text="`5`l╚══════════════╝"/>
         <sound key="${entity.firework_rocket.twinkle}"/>
     </action>
     <trigger filter="team-one-own-goal" action="message-own-scored" scope="player"/>
@@ -824,6 +831,15 @@
     <portal destination="team-two-spawn" filter="team-two-buytime" region="not-cages" yaw="@${team-two-yaw}" pitch="@${team-two-pitch}" sound="false"/>
 </portals>
 <flags flag-proximity-metric="none" net-proximity-metric="none">
+    <post id="default-post" yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)">${flag-post}</post>
+    <if constant="team-flag-posts" constant-value="true">
+        <post id="team-one-post" yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)" fallback="default-post">
+            <post respawn-filter="not(dropped-from-team-one-post)">${team-one-flag-post}</post>
+        </post>
+        <post id="team-two-post" yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)" fallback="default-post">
+            <post respawn-filter="not(dropped-from-team-two-post)">${team-two-flag-post}</post>
+        </post>
+    </if>
     <flag id="flag"
           name="Flag"
           color="${flag-color}"
@@ -832,14 +848,8 @@
           carry-kit="${flag-carrier-effects}"
           carry-message="`f`lYou are the `b`lFlag `f`lcarrier!"
           show-messages="false"
-          show-effects="false">
-        <post yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)">
-            <post id="default-post" respawn-filter="never">${flag-post}</post>
-            <if constant="team-flag-posts" constant-value="true">
-                <post id="team-one-post" respawn-filter="never">${team-one-flag-post}</post>
-                <post id="team-two-post" respawn-filter="never">${team-two-flag-post}</post>
-            </if>
-        </post>
+          show-effects="false"
+          post="default-post">
         <unless constant="team-flag-posts" constant-value="true">
             <net points="${score-points}" region="team-one-portal" capture-filter="team-two"/>
             <net points="${score-points}" region="team-two-portal" capture-filter="team-one"/>
