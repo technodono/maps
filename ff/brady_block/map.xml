@@ -114,19 +114,19 @@
         <effect duration="3s" amplifier="2">speed</effect>
     </kit>
 	<kit id="feather-kit">
-		<item slot="3" amount="1" consumable="sprint" name="Sprint" material="${feather-type}"/>
+		<item slot="3" amount="1" consumable="sprint" name="`rSprint" material="${feather-type}"/>
 	</kit>
     <kit id="keeper-kit" force="true">
         <clear/>
         <item slot="0" unbreakable="true" locked="true" material="stone sword"/>
 		<item slot="1" locked="true" material="402" name="`4`lX"/>/>
-        <item slot="8" locked="true" material="golden apple"/>
+        <item slot="8" material="golden apple"/>
         <helmet unbreakable="true" team-color="true" locked="true" material="leather helmet"/>
         <chestplate unbreakable="true" team-color="true" locked="true" material="leather chestplate"/>
         <leggings unbreakable="true" locked="true" material="chainmail leggings"/>
         <boots unbreakable="true" locked="true" material="iron boots"/>
 		<item slot="2" amount="4" material="leaves" name="`6Body Block"/>
-		<item slot="3" amount="1" consumable="sprint" name="Sprint" material="${feather-type}"/>
+		<item slot="3" amount="1" consumable="sprint" name="`rSprint" material="${feather-type}"/>
         <effect duration="0.01s" amplifier="1">night vision</effect>
         <effect duration="0.01s" amplifier="1">slowness</effect>
         <max-health>20</max-health>
@@ -139,10 +139,10 @@
         <leggings unbreakable="true" team-color="true" locked ="true" material="leather leggings"/>
         <boots unbreakable="true" locked ="true" team-color="true" material="leather boots"/>
 		<item slot="2" amount="4" material="leaves" name="`6Body Block"/>
-		<item slot="3" amount="1" consumable="sprint" name="Sprint" material="${feather-type}"/>
+		<item slot="3" amount="1" consumable="sprint" name="`rSprint" material="${feather-type}"/>
         <item slot="0" unbreakable="true" locked="true" material="stone sword"/>
         <item slot="1" amount="1" locked="true" consumable="use-snowball" name="`4`lFootball"  material="snowball"/>
-        <item slot="8" amount="1" locked="true" material="golden apple"/>
+        <item slot="8" amount="1" material="golden apple"/>
         <effect ambient="false">night vision</effect>
         <effect ambient="false">slowness</effect>
         <effect duration="3s" amplifier="1">fire resistance</effect>
@@ -963,9 +963,9 @@
 <kill-rewards>
     <kill-reward>
         <kit deduct-items="false">
-            <item material="golden apple" locked="true" slot="8"/>
+            <item material="golden apple" slot="8"/>
 			<item material="leaves" amount="2" name="`6Body Block"/>
-			<item material="${feather-type}" amount="1" consumable="sprint" name="Sprint"/>
+			<item material="${feather-type}" amount="1" consumable="sprint" name="`rSprint"/>
         </kit>
     </kill-reward>
     <kill-reward filter="any(victim-has-flag,victim-died-with-flag)" action="flag-steal-event" victim-action="death-player-state"/>
