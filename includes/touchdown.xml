@@ -1,7 +1,7 @@
 <map>
 <!-- Touchdown gamemode include file -->
 <!-- XML by zzuf, arcadeboss, MewTwoKing, Furrie, TommyHillfigger, KuNet, honeyfuggle & mameBT -->
-<!-- Version 2025.08.22-2-fireballs -->
+<!-- Version 2025.08.25-3-fireballs -->
 <game>Touchdown</game>
 <objective>Capture the flag at the end zone on the enemies' side!</objective>
 <constants fallback="true">
@@ -9,10 +9,8 @@
     <constant id="initial">0</constant>
     <constant id="carry">1</constant>
     <constant id="throw">2</constant>
-    <!-- Additional player_state value -->
-    <constant id="catch">3</constant>
     <!-- Additional game_state value -->
-    <constant id="death">4</constant>
+    <constant id="death">3</constant>
     <!-- Maps need to define the following constants -->
     <!--
     <constant id="team-size"></constant>
@@ -77,8 +75,11 @@
     <constant id="melee-weapon">stone sword</constant>
     <constant id="melee-weapon-name" delete="true"/> <!-- optional: custom name -->
     <constant id="melee-weapon-enchantment" delete="true"/> <!-- optional: enchantment ("knockback", etc) -->
+    <constant id="melee-weapon-attribute" delete="true"/>
     <constant id="natural-regeneration">true</constant>
     <constant id="gapple-heal-duration">5s</constant>
+    <constant id="disable-ally-damage">true</constant>
+    <constant id="friendly-fire-refund">off</constant>
     <!-- Change slot if using custom kit with different slot -->
     <constant id="gapple-slot">8</constant>
     <constant id="gapple-locked">true</constant>
@@ -104,7 +105,7 @@
     </kit>
     <kit id="main-kit">
         <clear items="true" armor="false" effects="false"/>
-        <item slot="0" unbreakable="true" locked="true" name="${melee-weapon-name}" material="${melee-weapon}" enchantment="${melee-weapon-enchantment}"/>
+        <item slot="0" unbreakable="true" locked="true" name="${melee-weapon-name}" material="${melee-weapon}" enchantment="${melee-weapon-enchantment}" attribute="${melee-weapon-attribute}"/>
         <item slot="8" locked="true" material="golden apple"/>
         <if constant="enable-night-vision" constant-value="true">
             <effect>night vision</effect>
@@ -218,10 +219,8 @@
     <consumable id="use-snowball" on="right click" override="false" action="snowball-thrown" consume="false"/>
 </consumables>
 <variables>
-    <timelimit id="time_limit"/>
-    <score id="team_score"/>
-    <with-team id="team_one_score" var="team_score" team="team-one"/>
-    <with-team id="team_two_score" var="team_score" team="team-two"/>
+    <with-team id="team_one_score" var="score" team="team-one"/>
+    <with-team id="team_two_score" var="score" team="team-two"/>
     <variable id="game_state" scope="match" default="${initial}"/>
     <variable id="can_score" scope="match" default="1"/>
     <variable id="round_status" scope="match" default="2"/>
@@ -278,14 +277,9 @@
     <after id="just-before-reset" duration="${flag-prerespawn}" filter="any(game_state=${throw},game_state=${death})"/>
     <all id="valid-receive">
         <variable var="can_score">1</variable>
-        <cause>projectile</cause>
         <attacker>
-            <variable var="player_state">${catch}</variable>
+            <variable var="player_state">${throw}</variable>
         </attacker>
-    </all>
-    <all id="valid-pass">
-        <variable var="can_score">1</variable>
-        <variable var="player_state">${throw}</variable>
         <victim>
             <cause>projectile</cause>
         </victim>
@@ -296,15 +290,12 @@
     <victim id="victim-has-flag">
         <variable var="player_state">${carry}</variable>
     </victim>
-    <allow id="flag-carrier-alive">
-        <all>
-            <variable var="player_state">${carry}</variable>
-            <alive/>
-        </all>
-    </allow>
     <all id="reset-observer-variables">
         <observing/>
-        <variable var="player_state">${carry}</variable>
+        <any>
+            <variable var="player_state">${carry}</variable>
+            <variable var="player_state">${throw}</variable>
+        </any>
     </all>
     <all id="team-one-scored">
         <team>team-one</team>
@@ -406,6 +397,14 @@
     <players id="instaheal-min" min="${instaheal-required}">
         <always/>
     </players>
+    <all id="can-pickup-flag">
+        <alive/> <!-- This shouldn't be possible but it is -->
+        <any>
+            <region id="flag-posts"/>
+            <filter id="carrying-football"/>
+            <variable var="player_state">${carry}</variable>
+        </any>
+    </all>
     <if constant="team-flag-posts" constant-value="true">
         <flag-dropped id="dropped-from-team-one-post" post="team-one-post">flag</flag-dropped>
         <flag-dropped id="dropped-from-team-two-post" post="team-two-post">flag</flag-dropped>
@@ -535,13 +534,6 @@
             <action id="flag-fire"/> <!-- Just in case -->
         </switch-scope>
     </action>
-    <action id="flag-pass-event" scope="player" filter="valid-pass">
-        <set var="player_state" value="${catch}"/>
-        <action id="give-main-kit"/>
-        <switch-scope inner="match" outer="player">
-            <action id="flag-fire"/> <!-- Just in case -->
-        </switch-scope>
-    </action>
     <action id="flag-steal-event" filter="game_state=${carry}" scope="player">
         <set var="player_state" value="${carry}"/>
         <set var="game_state" value="${carry}"/>
@@ -580,7 +572,6 @@
             </action>
         </action>
     </action>
-    <trigger action="reset-player-state" filter="player_state=${catch}" scope="player"/>
     <trigger action="reset-player-state" filter="reset-observer-variables" scope="player"/>
     <trigger action="flag-pickup-event" filter="all(has-flag,player_state=${initial})" scope="player"/>
     <trigger action="pickup-flag" filter="not(any(has-flag,nets))" scope="player"/>
@@ -754,36 +745,35 @@
     <!-- End match if overtime disabled (overtime=0) -->
     <trigger scope="match" filter="all(in-overtime,overtime=0)">
         <action>
-            <set var="time_limit" value="0"/>
+            <set var="timelimit" value="0"/>
         </action>
     </trigger>
+    <!-- Action to remove timelimit -->
+    <action id="remove-timelimit" scope="match" expose="true">
+        <set var="overtime" value="1"/>
+        <set var="timelimit" value="-10"/>
+    </action>
     <!-- End match on score in tiebreaker mode (overtime=2) -->
     <trigger scope="match" filter="all(in-overtime,overtime=2)">
         <action>
-            <set var="time_limit" value="-10"/>
+            <set var="timelimit" value="-10"/>
             <message text=" `e⚠ `b`lTIEBREAKER! `7First team to score `awins `7the match."/>
-            <!-- If score/mercy limits are ever made into variables, change scores + those instead -->
         </action>
     </trigger>
     <action id="tiebreaker-win" scope="player" filter="all(in-overtime,overtime=2)">
-        <unless constant="gridiron-engine" constant-value="true">
-            <set var="team_score" value="${score-limit}"/>
-        </unless>
-        <if constant="gridiron-engine" constant-value="true">
-            <switch-scope inner="match">
-                <set var="time_limit" value="0"/>
-            </switch-scope>
-        </if>
+        <switch-scope inner="match">
+            <set var="timelimit" value="0"/>
+        </switch-scope>
     </action>
-    <!-- Instaheal stuff -->
+    <!-- Dynamic instaheal -->
     <if constant="dynamic-instaheal" constant-value="true">
-        <trigger filter="not(instaheal-min)" scope="match">
+        <trigger filter="all(not(instaheal-min),match-started)" scope="match">
             <action>
                 <message text=" `e⚠ `fDue to a lack of players, `6❤ `e`lGAPPLE`f healing will be used."/>
                 <set var="instaheal" value="0"/>
             </action>
         </trigger>
-        <trigger filter="instaheal-min" scope="match">
+        <trigger filter="all(instaheal-min,match-started)" scope="match">
             <action>
                 <message text=" `e⚠ `d❤ `c`lI`6`lN`e`lS`a`lT`b`lA`d`lH`c`lE`6`lA`e`lL`f is now active!"/>
                 <set var="instaheal" value="1"/>
@@ -832,12 +822,26 @@
     <portal destination="team-two-spawn" filter="team-two-buytime" region="not-cages" yaw="@${team-two-yaw}" pitch="@${team-two-pitch}" sound="false"/>
 </portals>
 <flags flag-proximity-metric="none" net-proximity-metric="none">
-    <post id="default-post" yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)">${flag-post}</post>
+    <post id="default-post"
+          yaw="${flag-yaw}"
+          respawn-time="${flag-respawn}"
+          recover-time="0s"
+          pickup-filter="can-pickup-flag">${flag-post}</post>
     <if constant="team-flag-posts" constant-value="true">
-        <post id="team-one-post" yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)" fallback="default-post">
+        <post id="team-one-post"
+              yaw="${team-two-yaw}"
+              respawn-time="${flag-respawn}"
+              recover-time="0s"
+              pickup-filter="can-pickup-flag"
+              fallback="default-post">
             <post respawn-filter="not(dropped-from-team-one-post)">${team-one-flag-post}</post>
         </post>
-        <post id="team-two-post" yaw="${flag-yaw}" respawn-time="${flag-respawn}" recover-time="0s" pickup-filter="all(any(flag-posts,player_state=${carry},carrying-football),alive)" fallback="default-post">
+        <post id="team-two-post"
+              yaw="${team-one-yaw}"
+              respawn-time="${flag-respawn}"
+              recover-time="0s"
+              pickup-filter="can-pickup-flag"
+              fallback="default-post">
             <post respawn-filter="not(dropped-from-team-two-post)">${team-two-flag-post}</post>
         </post>
     </if>
@@ -850,7 +854,7 @@
           carry-message="`f`lYou are the `b`lFlag `f`lcarrier!"
           show-messages="false"
           show-effects="false"
-          capture-filter="player_state=${carry}"
+          capture-filter="carrying-football"
           post="default-post">
         <unless constant="team-flag-posts" constant-value="true">
             <net points="${score-points}" region="team-one-portal" capture-filter="team-two"/>
@@ -885,11 +889,11 @@
 </itemremove>
 <disabledamage>
     <damage>fall</damage>
-    <damage ally="true" enemy="false" other="false">entity attack</damage>
+    <damage ally="${disable-ally-damage}" enemy="false" other="false">entity attack</damage>
 </disabledamage>
-<damage attacker-action="flag-pass-event" victim-action="flag-receive-event"/>
+<damage victim-action="flag-receive-event"/>
 <friendlyfire>on</friendlyfire>
-<friendlyfirerefund>off</friendlyfirerefund>
+<friendlyfirerefund>${friendly-fire-refund}</friendlyfirerefund>
 <respawn delay="${respawn-timer}" auto="true"/>
 <hunger>
     <depletion>off</depletion>
