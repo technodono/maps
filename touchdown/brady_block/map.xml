@@ -1,7 +1,7 @@
 <map proto="1.5.0">
 <name>Brady Block: High IQ Color palette</name>
 <slug>brady_block</slug>
-<version>1.1.1</version>
+<version>1.1.2</version>
 <created>2025-07-25</created>
 <constants>
     <constant id="team-size">6</constant>
@@ -22,6 +22,7 @@
     <constant id="deny-block-interaction">false</constant>
     <constant id="main-kit">block-kit</constant>
     <constant id="flag-carrier-kit">flag-carrier-block</constant>
+    <constant id="dynamic-instaheal">true</constant>
     <!-- Brady Block specific -->
     <constant id="feather-check-enabled">1</constant>
     <constant id="feather-type">feather</constant>
