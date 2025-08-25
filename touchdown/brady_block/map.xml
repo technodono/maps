@@ -1,7 +1,7 @@
 <map proto="1.5.0">
 <name>Brady Block: High IQ Color palette</name>
 <slug>brady_block</slug>
-<version>1.1</version>
+<version>1.1.1</version>
 <created>2025-07-25</created>
 <constants>
     <constant id="team-size">6</constant>
@@ -54,18 +54,23 @@
         <item slot="3" amount="1" consumable="sprint" name="`rSprint" material="${feather-type}"/>
     </kit>
     <kit id="block-kit" parent="main-kit" force="true">
-        <item slot="1" locked="true" material="402" name="`4`lX"/>
+        <item slot="1" locked="true" material="firework charge" name="`4`lX"/>
         <item slot="2" amount="4" material="leaves" name="`6Body Block"/>
         <item slot="3" amount="1" consumable="sprint" name="`rSprint" material="${feather-type}"/>
         <game-mode>survival</game-mode>
     </kit>
-    <kit id="flag-carrier-block" parent="main-kit" force="true">
-        <kit id="football-kit"/>
-        <item slot="2" amount="4" material="leaves" name="`6Body Block"/>
-        <item slot="3" amount="1" consumable="sprint" name="`rSprint" material="${feather-type}"/>
-        <chestplate unbreakable="true" locked="true" color="FFFFFF" material="leather chestplate"/>
-        <leggings unbreakable="true" locked="true" team-color="true" material="leather leggings"/>
-        <boots unbreakable="true" team-color="true" locked="true" material="leather boots"/>
+    <kit id="flag-carrier-block" parent="flag-carrier-kit" force="true">
+        <action>
+            <replace-item ignore-metadata="true">
+                <find material="firework charge"/>
+                <replace material="air"/>
+            </replace-item>
+            <replace-item ignore-metadata="true">
+                <find material="snowball"/>
+                <replace material="air"/>
+            </replace-item>
+        </action>
+        <!-- An include action will return the football -->
     </kit>
 </kits>
 <consumables>
