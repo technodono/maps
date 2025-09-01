@@ -1,11 +1,11 @@
 <map>
 <!-- Touchdown gamemode include file -->
 <!-- XML by zzuf, arcadeboss, MewTwoKing, Furrie, TommyHillfigger, KuNet, honeyfuggle & mameBT -->
-<!-- Version 2025.08.31-1-fireballs -->
+<!-- Version 2025.08.31-4-fireballs -->
 <game>Touchdown</game>
 <objective>Capture the flag at the end zone on the enemies' side!</objective>
 <constants fallback="true">
-    <!-- game_state & player_state -->
+    <!-- game_state & player_state values -->
     <constant id="initial">0</constant>
     <constant id="carry">1</constant>
     <constant id="throw">2</constant>
@@ -53,12 +53,13 @@
     <constant id="armor-kit">armor-kit</constant>
     <constant id="flag-carrier-kit">flag-carrier-kit</constant>
     <constant id="flag-carrier-effects">flag-carrier-effects</constant>
+    <constant id="flag-carrier-health">14</constant> <!-- Only relevant for default flag effect kit -->
     <constant id="fire-material">fire</constant>
     <constant id="flag-color">white</constant>
     <constant id="deny-block-interaction">true</constant>
     <constant id="overtime-default">1</constant> <!-- 0: no overtime; 1: PGM default; 2: Tiebreaker mode -->
     <constant id="mercy-limit">-1</constant>
-    <constant id="indicator-outer-material">sea lantern</constant>
+    <constant id="indicator-outer-material">sea lantern</constant> <!-- Delete to disable physical indicators -->
     <constant id="indicator-inner-material" delete="true"/>
     <constant id="show-tutorial">0</constant> <!-- 0: disable tutorial; 1: enable tutorial -->
     <!-- Experimental or alternate options -->
@@ -90,8 +91,8 @@
 <include id="gapple-kill-reward"/>
 <time result="score" overtime="1m" max-overtime="1m">${time-limit}</time>
 <broadcasts>
-    <tip after="10s" every="70s">You can `6pass`r to your teammates by throwing the Football!</tip>
-    <tip after="25s" every="2m">Score by running into the end zone on the enemies' side!</tip>
+    <tip filter="show_tutorial=1" after="10s" every="70s">You can `6pass`r to your teammates by throwing the Football!</tip>
+    <tip filter="show_tutorial=1" after="25s" every="2m">Score by running into the end zone on the enemies' side!</tip>
 </broadcasts>
 <teams>
     <team id="team-one" color="${team-one-color}" max="${team-size}" max-overfill="${max-overfill}">${team-one-name}</team>
@@ -137,7 +138,7 @@
         </unless>
         <effect>slowness</effect>
         <effect duration="3s">fire resistance</effect>
-        <max-health>14</max-health>
+        <max-health>${flag-carrier-health}</max-health>
     </kit>
     <kit id="pre-round-kit" force="true">
         <effect>invisibility</effect>
@@ -430,7 +431,7 @@
         <any>
             <filter id="has-flag"/>
             <all>
-                <any>
+                <any id="in-capture-region">
                     <all>
                         <filter id="team-one"/>
                         <region id="team-two-portal"/>
@@ -455,6 +456,7 @@
         </all>
     </any>
     <relation id="ally-damage">ally</relation>
+    <relation id="enemy-damage">enemy</relation>
     <if constant="team-flag-posts" constant-value="true">
         <flag-dropped id="dropped-from-team-one-post" post="team-one-post">flag</flag-dropped>
         <flag-dropped id="dropped-from-team-two-post" post="team-two-post">flag</flag-dropped>
@@ -471,7 +473,7 @@
         <set var="game_state" value="${throw}"/>
         <set var="flag_carrier" value="0"/>
         <switch-scope inner="match" outer="player">
-            <message text="`e⚠ {player} `6threw the `c`lFootball`6!`r" actionbar="`l{player} `6threw!">
+            <message text=" `e⚠ {player} `6threw the `c`lFootball`6!`r" actionbar="`l{player} `6threw!">
                 <replacements>
                     <player id="player" var="flag_carrier"/>
                 </replacements>
@@ -518,7 +520,7 @@
         <sound key="${entity.player.levelup}" volume="0.7" pitch="1.5"/>
         <action id="apply-heal"/>
         <switch-scope inner="match" outer="player">
-            <message text="`e⚠ {player} `6picked up the `c`lFlag`6!`r" actionbar="`l{player} `6picked up!">
+            <message text=" `e⚠ {player} `6picked up the `c`lFlag`6!`r" actionbar="`l{player} `6picked up!">
                 <replacements>
                     <player id="player" var="flag_carrier"/>
                 </replacements>
@@ -529,8 +531,10 @@
             <set var="do_fire" value="1"/>
             <fill region="flag-posts" material="air"/>
             <unless constant="team-flag-posts" constant-value="true">
-                <fill region="flag-indicator-upper" material="air"/>
-                <fill region="flag-indicator-lower" material="air"/>
+                <unless constant="indicator-outer-material" constant-comparison="defined delete">
+                    <fill region="flag-indicator-upper" material="air"/>
+                    <fill region="flag-indicator-lower" material="air"/>
+                </unless>
             </unless>
         </switch-scope>
     </action>
@@ -548,7 +552,7 @@
         </switch-scope>
     </action>
     <action id="reset-flag-message-send" scope="match">
-        <message text="`e⚠ `6The `c`lFlag`6 was `c`lReset`6!" actionbar="`c`lThe Flag was Reset!"/>
+        <message text=" `e⚠ `6The `c`lFlag`6 was `c`lReset`6!" actionbar="`c`lThe Flag was Reset!"/>
         <sound key="${entity.firework_rocket.twinkle}" volume="1" pitch="1"/>
         <sound key="${entity.item.pickup}" volume="0.5" pitch="1.5"/>
     </action>
@@ -560,8 +564,10 @@
             <set var="player_state" value="${initial}"/>
         </switch-scope>
         <unless constant="team-flag-posts" constant-value="true">
-            <fill region="flag-indicator-upper" material="${indicator-outer-material}"/>
-            <fill region="flag-indicator-lower" material="${indicator-outer-material}"/>
+            <unless constant="indicator-outer-material" constant-comparison="defined delete">
+                <fill region="flag-indicator-upper" material="${indicator-outer-material}"/>
+                <fill region="flag-indicator-lower" material="${indicator-outer-material}"/>
+            </unless>
             <unless constant="indicator-inner-material" constant-comparison="defined delete">
                 <fill region="flag-indicator-upper-inner" material="${indicator-inner-material}"/>
                 <fill region="flag-indicator-lower-inner" material="${indicator-inner-material}"/>
@@ -581,13 +587,13 @@
                 <set var="passed_once" value="1"/>
             </switch-scope>
         </action>
-        <action filter="not(ally-damage)">
+        <action filter="enemy-damage">
             <switch-scope inner="match">
                 <set var="passed_once" value="0"/>
             </switch-scope>
         </action>
         <switch-scope inner="match" outer="player">
-            <message text="`e⚠ {player} `6caught the `c`lFootball`6!`r" actionbar="`l{player} `6caught!">
+            <message text=" `e⚠ {player} `6caught the `c`lFootball`6!`r" actionbar="`l{player} `6caught!">
                 <replacements>
                     <player id="player" var="flag_carrier"/>
                 </replacements>
@@ -614,7 +620,7 @@
         <action id="pickup-flag"/>
         <action id="apply-heal"/>
         <switch-scope inner="match" outer="player">
-            <message text="`e⚠ {player} `6stripped the `c`lFlag`6!`r" actionbar="`l{player} `6stripped!">
+            <message text=" `e⚠ {player} `6stripped the `c`lFlag`6!`r" actionbar="`l{player} `6stripped!">
                 <replacements>
                     <player id="player" var="flag_carrier"/>
                 </replacements>
@@ -857,10 +863,12 @@
     <!-- Enable or disable one pass rule -->
     <action id="enable-one-pass" expose="true" scope="match">
         <message text=" `e⚠ `aOne pass rule has been enabled!"/>
+        <sound preset="alert"/>
         <set var="one_pass_rule" value="1"/>
     </action>
     <action id="disable-one-pass" expose="true" scope="match">
         <message text=" `e⚠ `cOne pass rule has been disabled!"/>
+        <sound key="${block.note_block.bass}" volume="1" pitch="0.75"/>
         <set var="one_pass_rule" value="0"/>
     </action>
     <!-- Announce if one pass rule is in effect -->
@@ -870,6 +878,14 @@
         </filter>
         <action filter="one_pass_rule=1">
             <message text=" `e⚠ `aOne pass rule is in effect for this match!"/>
+            <sound preset="alert"/>
+        </action>
+    </trigger>
+    <!-- Tell player why they can't capture the flag if one pass enabled -->
+    <trigger scope="player" filter="all(has-flag,in-capture-region,not(one-pass-enforcement))">
+        <action>
+            <message text=" `e⚠ `cYou must pass the flag to a teammate before scoring!" actionbar="`c`lYou must pass the flag to a teammate before scoring!"/>
+            <sound key="${block.note_block.bass}" volume="1" pitch="0.75"/>
         </action>
     </trigger>
 </actions>
