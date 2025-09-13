@@ -1,7 +1,7 @@
 <map proto="1.5.0">
 <name>Brady Block: High IQ Color palette</name>
 <slug>brady_block</slug>
-<version>1.1.2</version>
+<version>1.1.3</version>
 <created>2025-07-25</created>
 <constants>
     <constant id="team-size">6</constant>
@@ -141,8 +141,8 @@
 </actions>
 <regions>
     <cuboid id="playing-field" min="-49,23,-99" max="1,30,10"/>
-    <cuboid id="team-one-portal" min="-32,3,-55" max="33,7,-43"/>
-    <cuboid id="team-two-portal" min="-32,3,44" max="33,7,56"/>
+    <cuboid id="team-one-portal" min="-48,24,-100" max="1,28,-89"/>
+    <cuboid id="team-two-portal" min="-48,24,0" max="1,28,11"/>
     <cuboid id="flag-indicator-upper" min="-25,35,-46" max="-22,40,-43"/>
     <cuboid id="flag-indicator-lower" min="-25,32,-46" max="-22,34,-43"/>
     <!-- Brady Block specific -->
