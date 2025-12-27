@@ -1,7 +1,7 @@
 <map proto="1.5.0">
 <name>Untitled - [1]</name>
 <game>Touchdown</game>
-<version>1.0.0</version>
+<version>1.0.2</version>
 <created>2025-12-07</created>
 <modifybowprojectile pickup-filter="never"/>
 <constants>
@@ -28,9 +28,17 @@
     <constant id="lvl-2-flag-health">12</constant>
     <constant id="lvl-3-flag-health">14</constant>
     <constant id="lvl-1-speed">0.95</constant>
-    <constant id="lvl-3-speed">1.15</constant>
+    <constant id="lvl-3-speed">1.25</constant>
     <constant id="superjump-ability-cooldown">8</constant> <!-- 8 seconds -->
+    <constant id="superjump-ability-power">3.2</constant> <!-- 8 seconds -->
     <constant id="tackle-ability-cooldown">80</constant> <!--80 ticks-->
+    <constant id="gearup-ability-cooldown">60</constant> <!-- ticks-->
+    
+    <!-- For the blocker ability, detemine the state of the victim -->
+    <constant id="reset">-1</constant>
+    <constant id="tackled">1</constant>
+    <constant id="force-stripped">2</constant> 
+
 </constants>
 <include id="touchdown"/>
 <authors>
@@ -68,9 +76,13 @@
     <kit id="lvl-2-flag-health" filter="any(has-jumper,has-paramedic,has-blocker)">
         <max-health>${lvl-2-flag-health}</max-health>
     </kit>
-    <kit id="lvl-3-flag-health" filter="any(has-ranger,has-attacker)">
+    <kit id="lvl-3-flag-health" filter="any(has-ranger,has-brute)">
         <max-health>${lvl-3-flag-health}</max-health>
     </kit>
+    <kit id="superjump-ability-kit" filter="has-jumper">
+        <double-jump recharge-time="${superjump-ability-cooldown}" power="${superjump-ability-power}"/>
+    </kit>
+    <lend kit="superjump-ability-kit" filter="all(not(has-flag-0.01),dynamic-jumper-class-check,not(during-buytime))"/>
     <kit id="custom-tutorial-kit">
             <book show-other="false">
                 <title>`e`lHow to Play and Class List</title>
@@ -122,15 +134,12 @@
                     </page>
                     <page>
                         `2» `lCLASSES
-                        `2» Attacker (1/6)`0
+                        `2» Brute (1/6)`0
                         `8» Weapons (Stone Sword)`0
 
-                        The core class of 
-                        teamfight touchdown. 
-                        With it's well rounded 
-                        stats and simple kit it 
-                        is a great introduction
-                        to teamfight touchdown.
+                        This class starts with a powerful chestplate that lets them block a single tackle and that regenerates over time.
+                        
+                        This class has knockback reduction.
                     </page>
                     <page>
                         `2» `lCLASSES
@@ -185,24 +194,34 @@
                 </pages>
             </book>
     </kit>
-<give kit="custom-tutorial-kit" filter="all(observing)"/>
+    <give kit="custom-tutorial-kit" filter="all(observing)"/>
+    <give kit="brute" filter="during-buytime"/>
+    <give kit="assasin" filter="during-buytime"/>
+    <give kit="ranger" filter="during-buytime"/>
+    <give kit="paramedic" filter="during-buytime"/>
+    <give kit="jumper" filter="during-buytime"/>
+    <give kit="blocker" filter="during-buytime"/>
+
 </kits>
 <classes family="Classes">
-    <class name="Attacker" default="true" description="`a`lMovement| ██`8░ `n`6`lCombat| ██`8░ `n`d`lHealth| ███ `n`b`l Ability: `7None " icon="gold sword">
-        <kit parents="base-kit" id="attacker">
+    <class name="Brute" default="true" description="`a`lMovement| █`8░░ `n`6`lCombat| ██`8░ `n`d`lHealth| ███ `n`b`l Ability: `7Geared-Up" icon="powered minecart">
+        <kit parents="base-kit" id="brute" filter="has-brute">
+            <action id="reset-gearup-cooldown"/>
             <item slot="0" unbreakable="true" material="stone sword"/>
-            <chestplate unbreakable="true" color="7f7f7f" locked="true" material="leather chestplate"/>
+            <chestplate unbreakable="true" locked="true" material="chainmail chestplate"/>
+            <walk-speed>${lvl-1-speed}</walk-speed>
+            <knockback-reduction>0.25</knockback-reduction>
         </kit>
     </class>
         <class name="Assasin" description="`a`lMovement| ███ `n`6`lCombat| ███ `n`d`lHealth| █`8░░ `n`b`l Ability: `7Lifesteal" icon="blaze powder">
-            <kit parents="base-kit" id="assasin">
+            <kit parents="base-kit" id="assasin" filter="has-assasin">
                 <item slot="0" unbreakable="true" material="stone sword" enchantment="sharpness:1"/>
                 <chestplate unbreakable="true" color="FF0C7F" locked="true" material="leather chestplate"/>
                 <walk-speed>${lvl-3-speed}</walk-speed>
             </kit>
         </class>
         <class name="Ranger" description="`a`lMovement| █`8░░ `n`6`lCombat| ███ `n`d`lHealth| ███ `n`b`l Ability: `7Crossbow Kit" icon="arrow">
-            <kit parents="base-kit" id="ranger">
+            <kit parents="base-kit" id="ranger" filter="has-ranger">
                 <item slot="0" unbreakable="true" material="stone sword"/>
                 <item slot="1" amount="6" projectile="arrow" name="`rCrossbow" lore="`r`7Right-click to fire!" material="firework charge"/>
                 <chestplate unbreakable="true" color="7FFF0C" locked="true" material="leather chestplate"/>
@@ -210,7 +229,7 @@
             </kit>
         </class>
         <class name="Paramedic" description="`a`lMovement| ██`8░ `n`6`lCombat| █`8░░ `n`d`lHealth| ██`8░ `n`b`l Ability: `7Support Kit" icon="exp bottle">
-            <kit parents="base-kit" id="paramedic">
+            <kit parents="base-kit" id="paramedic" filter="has-paramedic">
                 <item slot="0" unbreakable="true" material="wood sword"/>
                 <chestplate unbreakable="true" color="0fffff" locked="true" material="leather chestplate"/>
                 <item amount="2" material="potion" damage="16385" name="Super Heal">
@@ -220,17 +239,16 @@
             </kit>
         </class>
         <class name="Jumper" description="`a`lMovement| ███ `n`6`lCombat| █`8░░ `n`d`lHealth| ██`8░ `n`b`l Ability: `7Superjump" icon="flint and steel">
-            <kit parents="base-kit" id="jumper">
+            <kit parents="base-kit" id="jumper" filter="has-jumper">
                 <item slot="0" unbreakable="true" material="wood sword"/>
                 <chestplate unbreakable="true" color="BF8CFF" locked="true" material="leather chestplate"/>
-                <double-jump recharge-time="${superjump-ability-cooldown}" power="3.5"/>
             </kit>
         </class>
         <class name="Blocker" description="`a`lMovement| █`8░░ `n`6`lCombat| ██`8░ `n`d`lHealth| ██`8░ `n`b`l Ability: `7Tackle" icon="anvil">
-            <kit parents="base-kit" id="blocker">
+            <kit parents="base-kit" id="blocker" filter="has-blocker">
                 <action id="reset-tackle-cooldown"/>
                 <item slot="0" unbreakable="true" material="stone sword"/>
-                <item slot="2" material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
+                <item slot="1" material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
                 <chestplate unbreakable="true" color="FFBF0C" locked="true" material="leather chestplate"/>
                 <knockback-reduction>0.25</knockback-reduction>
                 <walk-speed>${lvl-1-speed}</walk-speed>
@@ -250,22 +268,37 @@
 <variables>
     <player-location id="xp_bar_prog" component="exp progress"/>
     <variable id="tackle_ability_cd" default="0" scope="player"/>
+    <variable id="gearup_ability_cd" default="0" scope="player"/>
+    <variable id="attack_action" default="${reset}" exclusive="1" scope="player"/>
 </variables>
 <filters>
-    <class id="has-attacker">Attacker</class>
+    <class id="has-brute">Brute</class>
     <class id="has-assasin">Assasin</class>
     <class id="has-ranger">Ranger</class>
     <class id="has-paramedic">Paramedic</class>
     <class id="has-jumper">Jumper</class>
     <class id="has-blocker">Blocker</class>
+
+    <all id="dynamic-jumper-class-check">
+        <wearing>
+            <item unbreakable="true" color="BF8CFF" locked="true" material="leather chestplate"/>
+        </wearing>
+        <alive/>
+    </all>
     <after filter="not(has-flag)" duration="0.01" id="not-has-flag-0.01"/>
     <after filter="has-flag" duration="0.01" id="has-flag-0.01"/>
     <pulse id="tackle-progress" duration="0.05" period="0.1" filter="all(tackle_ability_cd=1..,not(during-buytime))"/>
+    <pulse id="gearup-progress" duration="0.05" period="0.1" filter="all(gearup_ability_cd=1..,not(during-buytime))"/>
     <all id="can-force-strip-flag">
         <victim>
-            <variable var="player_state">${carry}</variable>
+            <all>
+                <variable var="player_state">${carry}</variable>
+                <not>
+                    <filter id="wearing-chainmail-chestplate"/> 
+                </not>
+            </all>
         </victim>
-        <all id="attacker-is-using-ability">
+        <all id="attacker-is-using-blocker-ability">
             <cause>melee</cause>
             <attacker>
                 <holding id="holding-gold-hoe" ignore-metadata="true" ignore-name="true" ignore-enchantments="true">
@@ -274,6 +307,17 @@
             </attacker>
         </all>
     </all>
+
+    <attacker id="attacker-can-ability">
+        <variable var="attack_action">[${tackled},${force-stripped}]</variable>
+    </attacker>
+    <attacker id="attacker-can-force-strip">
+        <variable var="attack_action">${force-stripped}</variable>
+    </attacker>
+
+    <wearing id="wearing-chainmail-chestplate" ignore-metadata="true">
+        <item material="chainmail chestplate"/>
+    </wearing>
     <carrying id="has-gold-hoe">
         <item material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
     </carrying>
@@ -284,31 +328,60 @@
 <actions>
     <trigger filter="not-has-flag-0.01" action="apply-custom-healthbars" scope="player"/>
     <trigger filter="has-flag-0.01" action="apply-custom-flag-healthbars" scope="player"/>
-    <action id="use-tackle-ability" scope="player" filter="attacker-is-using-ability">
+    <action id="use-tackle-ability" scope="player" filter="attacker-is-using-blocker-ability">
+        <set var="attack_action" value="${tackled}"/>
         <action filter="can-force-strip-flag">
+            <set var="attack_action" value="${force-stripped}"/> 
             <action id="flag-steal-event"/>
         </action>
-        <replace-item>
+        <replace-item ignore-metadata="true">
             <find material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
             <replace material="stone hoe" prevent-sharing="true" name="`7Ability: `8`lTackle" lore="`7Instantly strips the flag carrier."/>
         </replace-item>
         <set var="tackle_ability_cd" value="${tackle-ability-cooldown}"/>
         <set var="xp_bar_prog" value="0"/>
+        <sound key="random.anvil_land" pitch="0.7" volume="0.3"/>
+        <sound key="game.potion.smash" pitch="0.7" volume="2"/>
+    </action>
+    <action id="use-gearup-ability" scope="player">
+        <replace-item ignore-metadata="true">
+            <find material="chainmail chestplate" prevent-sharing="true"/>
+            <replace material="leather chestplate"  locked="true" color="7f7f7f" prevent-sharing="true"/>
+        </replace-item>
+        <set var="gearup_ability_cd" value="${gearup-ability-cooldown}"/>
+        <set var="xp_bar_prog" value="0"/>
+        <sound key="random.anvil_break" pitch="0.8" volume="1"/>
+        <message actionbar="`rGear`6 Used!"/>
     </action>
     <trigger filter="tackle-progress" scope="player">
         <action>
             <set var="tackle_ability_cd" value="tackle_ability_cd-1"/>
             <set var="xp_bar_prog" value="min(0.99, 1 - (tackle_ability_cd/${tackle-ability-cooldown}))" />
             <action filter="tackle_ability_cd=0">
-                <replace-item>
+                <replace-item ignore-metadata="true">
                     <find material="stone hoe" prevent-sharing="true" name="`7Ability: `8`lTackle" lore="`7Instantly strips the flag carrier."/>
                     <replace material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
                 </replace-item>
             </action>
         </action>
     </trigger>
+    <trigger filter="gearup-progress" scope="player">
+        <action>
+            <set var="gearup_ability_cd" value="gearup_ability_cd-1"/>
+            <set var="xp_bar_prog" value="min(0.99, 1 - (gearup_ability_cd/${gearup-ability-cooldown}))" />
+            <action filter="gearup_ability_cd=0">
+                <replace-item ignore-metadata="true">
+                    <find material="leather chestplate" prevent-sharing="true"/>
+                    <replace material="chainmail chestplate" locked="true" prevent-sharing="true"/>
+                </replace-item>
+            </action>
+        </action>
+    </trigger>
     <trigger filter="during-buytime" action="reset-tackle-cooldown" scope="player"/>
-    <action id="reset-tackle-cooldown"  scope="player">
+    <trigger filter="during-buytime" action="reset-gearup-cooldown" scope="player"/>
+    <trigger filter="all(not(has-gold-hoe),not(has-stone-hoe),not(during-buytime))" action="give-new-tackle-ability" scope="player"/>
+    
+    <action id="reset-tackle-cooldown" scope="player">
         <set var="tackle_ability_cd" value="0"/>
         <set var="xp_bar_prog" value="1"/>
         <replace-item>
@@ -316,11 +389,28 @@
             <replace material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
         </replace-item>
     </action>
-    <action id="receive-tackle-ability" scope="player" filter="can-force-strip-flag">
-        <set var="player_state" value="${initial}"/>
-        <set var="flag_carrier" value="0"/>
+    <action id="reset-gearup-cooldown" scope="player">
+        <set var="gearup_ability_cd" value="0"/>
+        <set var="xp_bar_prog" value="1"/>
+        <replace-item  ignore-metadata="true">
+            <find material="leather chestplate" prevent-sharing="true"/>
+            <replace material="chainmail chestplate" locked="true" prevent-sharing="true"/>
+        </replace-item>
     </action>
-    <trigger filter="all(not(has-gold-hoe),not(has-stone-hoe),not(during-buytime))" action="give-new-tackle-ability" scope="player"/>
+    <action id="receive-tackle-ability" scope="player" filter="attacker-can-ability">
+        <action filter="wearing-chainmail-chestplate">
+            <action id="use-gearup-ability"/>
+        </action>
+        <action filter="attacker-can-force-strip">
+            <set var="player_state" value="${initial}"/>
+            <set var="flag_carrier" value="0"/>
+            <sound key="random.anvil_land" pitch="0.7" volume="1"/>
+            <sound key="game.potion.smash" pitch="0.7" volume="2"/>
+            <message actionbar="`rFlag`6 Stolen!"/>
+        </action>
+        <set var="attack_action" value="${reset}"/>
+    </action>
+
     <action id="give-new-tackle-ability" scope="player" filter="all(has-blocker,alive)">
         <action filter="tackle_ability_cd=1..">
             <kit>
@@ -347,7 +437,7 @@
         <cuboid min="1,24,-100" max="2,28,11"/>
         <cuboid min="-49,24,-100" max="-48,28,11"/>
     </union>
-    <cuboid id="playing-field" min="-48,23,-100" max="1,30,11"/>
+    <cuboid id="playing-field" min="-48,23,-100" max="1,33,11"/>
     <cuboid id="team-one-portal" min="-48,24,-100" max="1,28,-89"/> <!-- where team two scores -->
     <cuboid id="team-two-portal" min="-48,24,0" max="1,28,11"/> <!-- where team one scores -->
     <cuboid id="flag-indicator-upper" min="-25,35,-46" max="-22,40,-43"/>
@@ -376,7 +466,7 @@
 <kill-rewards>
     <kill-reward filter="has-assasin">
         <kit>
-           <effect duration="2" amplifier="1">speed</effect>
+           <effect duration="3" amplifier="1">speed</effect>
            <effect duration="3" amplifier="3">regeneration</effect>
         </kit>
     </kill-reward>
