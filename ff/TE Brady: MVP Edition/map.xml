@@ -11,7 +11,7 @@
     <constant id="team-two-color">red</constant>
     <constant id="team-one-spawn">0.5,13,-57.5</constant>
     <constant id="team-one-yaw">0</constant>
-    <constant id="team-two-spawn">0.5,15,58.5</constant>
+    <constant id="team-two-spawn">0.5,13,58.5</constant>
     <constant id="team-two-yaw">180</constant>
     <constant id="flag-post">0.5,5,0.5</constant>
     <constant id="team-one-flag-post">0.5,2,-37.5</constant> <!-- Where flag respawns after a score -->
