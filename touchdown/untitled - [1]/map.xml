@@ -1,7 +1,7 @@
 <map proto="1.5.0">
 <name>Untitled - [1]</name>
 <game>Touchdown</game>
-<version>1.0.2</version>
+<version>1.0.3</version>
 <created>2025-12-07</created>
 <modifybowprojectile pickup-filter="never"/>
 <constants>
@@ -82,7 +82,7 @@
     <kit id="superjump-ability-kit" filter="has-jumper">
         <double-jump recharge-time="${superjump-ability-cooldown}" power="${superjump-ability-power}"/>
     </kit>
-    <lend kit="superjump-ability-kit" filter="all(not(has-flag-0.01),dynamic-jumper-class-check,not(during-buytime))"/>
+    <lend kit="superjump-ability-kit" filter="all(not-has-flag-4.00,dynamic-jumper-class-check,not(during-buytime))"/>
     <kit id="custom-tutorial-kit">
             <book show-other="false">
                 <title>`e`lHow to Play and Class List</title>
@@ -285,6 +285,7 @@
         </wearing>
         <alive/>
     </all>
+    <after filter="not(has-flag)" duration="4.00" id="not-has-flag-4.00"/>
     <after filter="not(has-flag)" duration="0.01" id="not-has-flag-0.01"/>
     <after filter="has-flag" duration="0.01" id="has-flag-0.01"/>
     <pulse id="tackle-progress" duration="0.05" period="0.1" filter="all(tackle_ability_cd=1..,not(during-buytime))"/>
