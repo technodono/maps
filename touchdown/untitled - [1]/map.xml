@@ -1,7 +1,7 @@
 <map proto="1.5.0">
 <name>Untitled - [1]</name>
 <game>Touchdown</game>
-<version>1.0.3</version>
+<version>1.0.4</version>
 <created>2025-12-07</created>
 <modifybowprojectile pickup-filter="never"/>
 <constants>
@@ -188,8 +188,6 @@
                         `8» Weapons (Stone Sword)`0
                         
                         Spawns with a rechargeable ability that knocks back enemies when hit and instantly strips the flag.
-                        
-                        This class has knockback reduction.
                     </page>
                 </pages>
             </book>
@@ -248,9 +246,8 @@
             <kit parents="base-kit" id="blocker" filter="has-blocker">
                 <action id="reset-tackle-cooldown"/>
                 <item slot="0" unbreakable="true" material="stone sword"/>
-                <item slot="1" material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
+                <item slot="1" material="gold hoe" enchantment="knockback:1" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
                 <chestplate unbreakable="true" color="FFBF0C" locked="true" material="leather chestplate"/>
-                <knockback-reduction>0.25</knockback-reduction>
                 <walk-speed>${lvl-1-speed}</walk-speed>
             </kit>
         </class>
@@ -320,7 +317,7 @@
         <item material="chainmail chestplate"/>
     </wearing>
     <carrying id="has-gold-hoe">
-        <item material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
+        <item material="gold hoe" enchantment="knockback:1" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
     </carrying>
     <carrying id="has-stone-hoe" ignore-metadata="true" ignore-name="true" ignore-enchantments="true">
         <item material="stone hoe" prevent-sharing="true" name="`7Ability: `8`lTackle" lore="`7Instantly strips the flag carrier."/>
@@ -336,7 +333,7 @@
             <action id="flag-steal-event"/>
         </action>
         <replace-item ignore-metadata="true">
-            <find material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
+            <find material="gold hoe" enchantment="knockback:1" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
             <replace material="stone hoe" prevent-sharing="true" name="`7Ability: `8`lTackle" lore="`7Instantly strips the flag carrier."/>
         </replace-item>
         <set var="tackle_ability_cd" value="${tackle-ability-cooldown}"/>
@@ -361,7 +358,7 @@
             <action filter="tackle_ability_cd=0">
                 <replace-item ignore-metadata="true">
                     <find material="stone hoe" prevent-sharing="true" name="`7Ability: `8`lTackle" lore="`7Instantly strips the flag carrier."/>
-                    <replace material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
+                    <replace material="gold hoe" enchantment="knockback:1" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
                 </replace-item>
             </action>
         </action>
@@ -387,7 +384,7 @@
         <set var="xp_bar_prog" value="1"/>
         <replace-item>
             <find material="stone hoe" prevent-sharing="true" name="`7Ability: `8`lTackle" lore="`7Instantly strips the flag carrier."/>
-            <replace material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
+            <replace material="gold hoe" enchantment="knockback:1" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
         </replace-item>
     </action>
     <action id="reset-gearup-cooldown" scope="player">
@@ -420,7 +417,7 @@
         </action>
         <action filter="tackle_ability_cd=0">
             <kit>
-                <item material="gold hoe" enchantment="knockback:2" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
+                <item material="gold hoe" enchantment="knockback:1" prevent-sharing="true" name="`rAbility: `e`lTackle" lore="`7Instantly strips the flag carrier."/>
             </kit>
         </action>
     </action>
@@ -482,6 +479,7 @@
     <item>stone hoe</item>
     <item>bow</item>
     <item>firework charge</item>
+    <item>chainmail chestplate</item>
 </itemremove>
 <toolrepair>
     <tool>compass</tool>
